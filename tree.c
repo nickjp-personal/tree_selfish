@@ -28,13 +28,16 @@ static char *hversion="\t\t tree v1.7.0 %s 1996 - 2014 by Steve Baker and Thomas
 /* Globals */
 bool dflag, lflag, pflag, sflag, Fflag, aflag, fflag, uflag, gflag;
 bool qflag, Nflag, Qflag, Dflag, inodeflag, devflag, hflag, Rflag;
-bool Hflag, siflag, cflag, Xflag, Jflag, duflag, pruneflag;
+bool Hflag, siflag, cflag, Xflag, Jflag, duflag, pruneflag, JQflag, eJSflag;
 bool noindent, force_color, nocolor, xdev, noreport, nolinks, flimit, dirsfirst;
 bool ignorecase, matchdirs;
 bool reverse;
 char *pattern = NULL, *ipattern = NULL, *host = NULL, *title = "Directory Tree", *sp = " ", *_nl = "\n";
+char *JQpath = NULL, *eJSpath = NULL;
 char *timefmt = NULL;
 const char *charset = NULL;
+const char *jquery  = NULL;
+const char *extjs   = NULL;
 
 off_t (*listdir)(char *, int *, int *, u_long, dev_t) = unix_listdir;
 int (*cmpfunc)() = alnumsort;
@@ -94,6 +97,8 @@ int main(int argc, char **argv)
   q = p = dtotal = ftotal = 0;
   aflag = dflag = fflag = lflag = pflag = sflag = Fflag = uflag = gflag = FALSE;
   Dflag = qflag = Nflag = Qflag = Rflag = hflag = Hflag = siflag = cflag = FALSE;
+  JQflag = eJSflag = FALSE;
+  JQpath = eJSpath = NULL;
   noindent = force_color = nocolor = xdev = noreport = nolinks = reverse = FALSE;
   ignorecase = matchdirs = dirsfirst = inodeflag = devflag = Xflag = Jflag = FALSE;
   duflag = pruneflag = FALSE;
@@ -225,7 +230,36 @@ int main(int argc, char **argv)
 	  Xflag = TRUE;
 	  break;
 	case 'J':
-	  Jflag = TRUE;
+	  if ( argv[i][j+1] == 0x00 ) {
+	    Jflag = TRUE;
+	    break;
+	  } else if ( (argv[i][j+1] == 'q') || (argv[i][j+1] == 'Q') ) {
+	    if (argv[n] == NULL) {
+	      fprintf(stderr,"tree: missing argument to -JQ option.\n");
+	      exit(1);
+	    }
+	    JQflag = TRUE;
+	    JQpath = argv[n++];
+	    eJSflag = FALSE;
+	    eJSpath = NULL;
+	    j++;
+	  } else if ( (argv[i][j+1] == 'e') || (argv[i][j+1] == 'E') ) {
+	    if (argv[n] == NULL) {
+	      fprintf(stderr,"tree: missing argument to -JE option.\n");
+	      exit(1);
+	    }
+	    JQflag = FALSE;
+	    JQpath = NULL;
+	    eJSflag = TRUE;
+	    eJSpath = argv[n++];
+	    j++;
+	  } else {
+	    fprintf(stderr,"tree: Invalid argument -`%c%c'.\n",argv[i][j], argv[i][j+1]);
+	    usage(1);
+	    exit(1);
+	  }
+	  Hflag = FALSE;
+	  Xflag = FALSE;
 	  break;
 	case 'H':
 	  Hflag = TRUE;
@@ -603,6 +637,7 @@ void usage(int n)
   /*     \t9!123456789!123456789!123456789!123456789!123456789!123456789!123456789! */
   fprintf(n < 2? stderr: stdout,
 	"usage: tree [-acdfghilnpqrstuvxACDFJQNSUX] [-H baseHREF] [-T title ]\n"
+	"\t[-JQ baseLib] [-JE baseLib]\n"
 	"\t[-L level [-R]] [-P pattern] [-I pattern] [-o filename] [--version]\n"
 	"\t[--help] [--inodes] [--device] [--noreport] [--nolinks] [--dirsfirst]\n"
 	"\t[--charset charset] [--filelimit[=]#] [--si] [--timefmt[=]<f>]\n"
@@ -657,6 +692,8 @@ void usage(int n)
 	"  ------- XML/HTML/JSON options -------\n"
 	"  -X            Prints out an XML representation of the tree.\n"
 	"  -J            Prints out an JSON representation of the tree.\n"
+	"  -JQ baseLib   Prints out an Jquery representation of the tree.\n"
+	"  -JE baseLib   Prints out an extJS representation of the tree.\n"
 	"  -H baseHREF   Prints out HTML format with baseHREF as top directory.\n"
 	"  -T string     Replace the default HTML title and H1 header with string.\n"
 	"  --nolinks     Turn off hyperlinks in HTML output.\n"
