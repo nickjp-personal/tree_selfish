@@ -1,0 +1,28 @@
+[
+  {"type":"directory","name":"./","children":[
+    {"type":"file",leaf:true,"name":"CHANGES","size":10513,"time":"Apr 23  2014"},
+    {"type":"file",leaf:true,"name":"INSTALL","size":596,"time":"Jun 24  2011"},
+    {"type":"file",leaf:true,"name":"LICENSE","size":18009,"time":"Aug 13  2004"},
+    {"type":"file",leaf:true,"name":"Makefile","size":2689,"time":"Oct 12 23:03"},
+    {"type":"file",leaf:true,"name":"README","size":5620,"time":"Apr 22  2014"},
+    {"type":"file",leaf:true,"name":"README.md","size":102,"time":"Aug 12  0:21"},
+    {"type":"file",leaf:true,"name":"TODO","size":2210,"time":"Jun 24  2011"},
+    {"type":"file",leaf:true,"name":"color.c","size":16494,"time":"Aug 12  1:02"},
+    {"type":"directory","name":"doc","size":4096,"time":"Aug 12  0:08","children":[
+      {"type":"file",leaf:true,"name":"tree.1","size":11124,"time":"Apr 24  2014"},
+      {"type":"file",leaf:true,"name":"tree.1.fr","size":7009,"time":"Mar 31  2005"},
+      {"type":"file",leaf:true,"name":"xml.dtd","size":2613,"time":"Jun 24  2011"}
+    ]},
+    {"type":"file",leaf:true,"name":"extjs.c","size":9447,"time":"Oct 12 20:37"},
+    {"type":"file",leaf:true,"name":"git.note","size":101,"time":"Aug 12  3:41"},
+    {"type":"file",leaf:true,"name":"hash.c","size":3151,"time":"Apr 22  2014"},
+    {"type":"file",leaf:true,"name":"html.c","size":14309,"time":"Apr 22  2014"},
+    {"type":"file",leaf:true,"name":"json.c","size":9421,"time":"Apr 22  2014"},
+    {"type":"file",leaf:true,"name":"strverscmp.c","size":5322,"time":"Aug 28  2008"},
+    {"type":"file",leaf:true,"name":"tree","size":88893,"time":"Oct 12 23:11"},
+    {"type":"file",leaf:true,"name":"tree.c","size":37785,"time":"Oct 12 20:36"},
+    {"type":"file",leaf:true,"name":"tree.h","size":5765,"time":"Oct 12 20:37"},
+    {"type":"file",leaf:true,"name":"unix.c","size":7556,"time":"Apr 19  2014"},
+    {"type":"file",leaf:true,"name":"xml.c","size":8934,"time":"Apr 22  2014"}
+  ]}
+]
