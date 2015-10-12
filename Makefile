@@ -20,12 +20,12 @@ prefix = /usr
 
 CC=gcc
 
-VERSION=1.7.0
+VERSION=1.7.0a
 TREE_DEST=tree
 BINDIR=${prefix}/bin
 MAN=tree.1
 MANDIR=${prefix}/man/man1
-OBJS=tree.o unix.o html.o xml.o json.o hash.o color.o
+OBJS=tree.o unix.o html.o xml.o json.o extjs.o hash.o color.o
 
 # Uncomment options below for your particular OS:
 

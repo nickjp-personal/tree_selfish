@@ -19,11 +19,12 @@
 
 #include "tree.h"
 
-static char *version ="$Version: $ tree v1.7.0 (c) 1996 - 2014 by Steve Baker, Thomas Moore, Francesc Rocher, Florian Sesser, Kyosuke Tokoro $";
-static char *hversion="\t\t tree v1.7.0 %s 1996 - 2014 by Steve Baker and Thomas Moore <br>\n"
+static char *version ="$Version: $ tree v1.7.0a (c) 1996 - 2014 by Steve Baker, Thomas Moore, Francesc Rocher, Florian Sesser, Kyosuke Tokoro, Nick jp $";
+static char *hversion="\t\t tree v1.7.0a %s 1996 - 2014 by Steve Baker and Thomas Moore <br>\n"
 		      "\t\t HTML output hacked and copyleft %s 1998 by Francesc Rocher <br>\n"
 		      "\t\t JSON output hacked and copyleft %s 2014 by Florian Sesser <br>\n"
-		      "\t\t Charsets / OS/2 support %s 2001 by Kyosuke Tokoro\n";
+		      "\t\t Charsets / OS/2 support %s 2001 by Kyosuke Tokoro <br>\n";
+		      "\t\t Ext-jp support %s 2015 by Nick jp\n";
 
 /* Globals */
 bool dflag, lflag, pflag, sflag, Fflag, aflag, fflag, uflag, gflag;
@@ -232,6 +233,7 @@ int main(int argc, char **argv)
 	case 'J':
 	  if ( argv[i][j+1] == 0x00 ) {
 	    Jflag = TRUE;
+	      fprintf(stderr,"takeone Jflag TRUE.\n");
 	    break;
 	  } else if ( (argv[i][j+1] == 'q') || (argv[i][j+1] == 'Q') ) {
 	    if (argv[n] == NULL) {
@@ -503,6 +505,10 @@ int main(int argc, char **argv)
     listdir = needfulltree ? json_rlistdir : json_listdir;
     colorize = FALSE;
     colored = FALSE; /* Do people want colored JSON output? */
+  } else if (eJSflag) {
+    listdir = needfulltree ? extjs_rlistdir : extjs_listdir;
+    colorize = FALSE;
+    colored = FALSE; /* Do people want colored JSON output? */
   } else {
     listdir = needfulltree ? unix_rlistdir : unix_listdir;
   }
@@ -528,7 +534,7 @@ int main(int argc, char **argv)
     fprintf(outfile,"<?xml version=\"1.0\"");
     if (charset) fprintf(outfile," encoding=\"%s\"",charset);
     fprintf(outfile,"?>%s<tree>%s",_nl,_nl);
-  } else if (Jflag)
+  } else if (Jflag || eJSflag)
     fputc('[',outfile);
 
   if (dirname) {
@@ -544,7 +550,7 @@ int main(int argc, char **argv)
 	if (colorize) colored = color(st.st_mode,dirname[i],n<0,FALSE);
 	size += st.st_size;
       }
-      if (Xflag || Jflag) {
+      if (Xflag || Jflag || eJSflag) {
 	mt = st.st_mode & S_IFMT;
 	for(j=0;ifmt[j];j++)
 	  if (ifmt[j] == mt) break;
@@ -553,6 +559,10 @@ int main(int argc, char **argv)
         else if (Jflag) {
 	  if (i) fprintf(outfile, ",");
           fprintf(outfile,"%s{\"type\":\"%s\",\"name\":\"%s\",\"contents\":[", noindent?"":"\n  ", ftype[j], dirname[i]);
+	}
+	else if (eJSflag) {
+	  if (i) fprintf(outfile, ",");
+          fprintf(outfile,"%s{\"type\":\"%s\",%s\"name\":\"%s\",\"children\":[", noindent?"":"\n  ", ftype[j], strcmp(ftype[j], "directory")?"leaf:true,":"", dirname[i]);
 	}
       } else if (!Hflag) printit(dirname[i]);
       if (colored) fprintf(outfile,"%s",endcode);
@@ -567,7 +577,7 @@ int main(int argc, char **argv)
 	}
       }
       if (Xflag) fprintf(outfile,"%s</%s>\n",noindent?"":"  ", ftype[j]);
-      if (Jflag) fprintf(outfile,"%s]}",noindent?"":"  ");
+      if (Jflag || eJSflag) fprintf(outfile,"%s]}",noindent?"":"  ");
     }
   } else {
     if ((n = lstat(".",&st)) >= 0) {
@@ -576,12 +586,13 @@ int main(int argc, char **argv)
       size = st.st_size;
     }
     if (Xflag) fprintf(outfile,"%s<directory name=\".\">",noindent?"":"  ");
-    else if (Jflag) fprintf(outfile, "{\"type\":\"directory\",\"name\": \".\",\"contents\":[");
+    else if (Jflag)   fprintf(outfile, "{\"type\":\"directory\",\"name\": \".\",\"contents\":[");
+    else if (eJSflag) fprintf(outfile, "{\"type\":\"directory\",\"name\": \".\",\"children\":[");
     else if (!Hflag) fprintf(outfile,".");
     if (colored) fprintf(outfile,"%s",endcode);
     size += listdir(".",&dtotal,&ftotal,0,0);
     if (Xflag) fprintf(outfile,"%s</directory>%s",noindent?"":"  ", _nl);
-    if (Jflag) fprintf(outfile,"%s]}",noindent?"":"  ");
+    if (Jflag || eJSflag) fprintf(outfile,"%s]}",noindent?"":"  ");
   }
 
   if (Hflag)
@@ -600,6 +611,8 @@ int main(int argc, char **argv)
       fprintf(outfile,",\"directories\":%d", dtotal);
       if (!dflag) fprintf(outfile,",\"files\":%d", ftotal);
       fprintf(outfile, "}");
+    } else if (eJSflag) {
+      /* Skip a report field */
     } else {
       if (duflag) {
 	psize(sizebuf, size);
@@ -622,7 +635,7 @@ int main(int argc, char **argv)
     fprintf(outfile,"</html>\n");
   } else if (Xflag) {
     fprintf(outfile,"</tree>\n");
-  } else if (Jflag) {
+  } else if (Jflag || eJSflag ) {
       fprintf(outfile, "%s]\n",_nl);
   }
 
